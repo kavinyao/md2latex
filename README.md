@@ -2,7 +2,11 @@
 
 A lame Markdown to LaTeX converter.
 
-See `test.md` for an example and run `python md2latex.py test.md > test.tex` to taste a flavor of it.
+## Install
+
+Run `pip install md2latex` (use `sudo` if necessary).
+
+See `test.md` for an example and run `md2latex test.md test.tex` to taste a flavor of it.
 
 ## Features
 
