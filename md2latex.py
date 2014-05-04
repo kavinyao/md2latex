@@ -1,4 +1,4 @@
-import sys
+import re
 import mistune
 
 def newline(func):
@@ -7,7 +7,25 @@ def newline(func):
 
     return inner
 
-class MyRenderer(mistune.Renderer):
+class MetaRenderer(mistune.Renderer):
+    def header(self, text, level, raw=None):
+        return '\\title{%s}' % text
+
+    @newline
+    def list(self, body, ordered=True):
+        return '\\author{%s}' % body
+
+    def list_item(self, text):
+        _, meta_key, meta_val = re.split(r'^([^:]+):\s+', text, maxsplit=1)
+        if meta_key != 'author':
+            return ''
+
+        return meta_val.rstrip()
+
+    def autolink(self, link, is_email=False):
+        return r'\\\texttt{%s}' % link
+
+class LaTeXRenderer(mistune.Renderer):
     FOOTNOTE = 'FTNT-MAGIC'
 
     use_block_quote = False
@@ -15,18 +33,22 @@ class MyRenderer(mistune.Renderer):
     use_hyperref = False
 
     def __init__(self):
+        super(mistune.Renderer, self).__init__()
         self.footnotes_ = {}
 
     def not_support(self, feature):
         raise NotImplemented('%s is not supported yet.' % feature)
 
+    @newline
     def block_code(self, code, lang=None):
         """Ref: http://scott.sherrillmix.com/blog/programmer/displaying-code-in-latex/"""
         code = code.rstrip()
-        return '\\begin{verbatim}%s\n\\end{verbatim}' % code
+        return '\\begin{verbatim}\n%s\n\\end{verbatim}' % code
 
+    @newline
     def block_quote(self, text):
         """Ref: http://tex.stackexchange.com/a/4970/43978"""
+        self.use_block_quote = True
         return '\\blockquote{%s}' % text
 
     def block_html(self, html):
@@ -38,12 +60,12 @@ class MyRenderer(mistune.Renderer):
             self.not_support('Header > 3')
 
         section = ('sub'*(level-1)) + 'section'
-        return '\\%s %s' % (section, text)
+        return '\\%s{%s}' % (section, text)
 
     @newline
     def hrule(self):
         """Ref: http://tex.stackexchange.com/a/17126/43978"""
-        return r'\noindent\rule{\textwidth}{0.4mm}'
+        return r'\noindent\rule{\textwidth}{0.4pt}'
 
     @newline
     def list(self, body, ordered=True):
@@ -115,7 +137,7 @@ class MyRenderer(mistune.Renderer):
 
     def footnote_item(self, key, text):
         # store footnotes for patch
-        self.footnotes_[key] = text
+        self.footnotes_[key] = text.strip()
         # return empty string as output
         return ''
 
@@ -123,8 +145,88 @@ class MyRenderer(mistune.Renderer):
         # return empty string as output
         return ''
 
-md = mistune.Markdown(renderer=MyRenderer())
+class MarkdownToLaTeXConverter(LaTeXRenderer):
+    meta_renderer = MetaRenderer()
 
+    def convert(self, doc):
+        try:
+            meta, body = doc.split('---', 1)
+        except ValueError:
+            raise ValueError('Your document seems missing the meta part.')
+
+        title = self.parse_meta(meta)
+        body = self.parse_body(body)
+
+        template = '''\\documentclass{article}
+
+%s
+
+%s
+\\begin{document}
+
+%s
+
+\\maketitle
+%s
+
+\\end{document}'''
+
+        return template % (self.resolve_packages(),
+                           self.resolve_commands(),
+                           title,
+                           body)
+
+    def parse_meta(self, meta):
+        md = mistune.Markdown(renderer=self.meta_renderer)
+        return md.render(meta)
+
+    def parse_body(self, content):
+        md = mistune.Markdown(renderer=self)
+        return self.resolve_footnotes(md.render(content))
+
+    ### The following commands use properties set in LaTeXRenderer
+
+    def resolve_footnotes(self, text):
+        parts = re.split(r'%s-([^}]+)' % self.FOOTNOTE, text)
+        new_parts = []
+        for i, part in enumerate(parts):
+            if i%2 == 0:
+                # normal part
+                new_parts.append(part)
+            else:
+                # footnote part
+                new_parts.append(self.footnotes_[part])
+
+        return ''.join(new_parts)
+
+    def resolve_packages(self):
+        packages = ['\\usepackage[bottom=1in,top=1in]{geometry}', '\\usepackage{parskip}']
+
+        if self.use_enumerate:
+            packages.append('\\usepackage{enumerate}')
+
+        if self.use_hyperref:
+            packages.append('\\usepackage[pdftex,colorlinks,urlcolor=blue]{hyperref}')
+
+        packages.append('\n\\geometry{letterpaper}')
+
+        return '\n'.join(packages)
+
+    def resolve_commands(self):
+        if self.use_block_quote:
+            return r"""
+\newenvironment{blockquote}{%
+  \par%
+  \medskip
+  \leftskip=4em\rightskip=2em%
+  \noindent\ignorespaces}{%
+  \par\medskip}
+"""
+        else:
+            return ''
+
+import sys
 with open(sys.argv[1]) as f:
-    print md.render(f.read())
+    converter = MarkdownToLaTeXConverter()
+    print converter.convert(f.read())
 
