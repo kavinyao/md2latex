@@ -4,7 +4,7 @@ import sys
 import md2latex
 
 if len(sys.argv) < 2:
-    print >> sys.stderr, 'Usage: %s <input.md> [output.tex]' % sys.argv[0]
+    print >> sys.stderr, 'Usage: md2latex <input.md> [output.tex]'
     sys.exit(1)
 
 with open(sys.argv[1]) as f:
