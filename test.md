@@ -35,8 +35,6 @@ My current plan of the converter includes:
 
 Now let's see how much we can do...
 
-Test hrule:
-
 ---
 
 Test quote:

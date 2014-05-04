@@ -49,7 +49,7 @@ class LaTeXRenderer(mistune.Renderer):
     def block_quote(self, text):
         """Ref: http://tex.stackexchange.com/a/4970/43978"""
         self.use_block_quote = True
-        return '\\blockquote{%s}' % text
+        return '\\begin{blockquote}%s\\end{blockquote}' % text
 
     def block_html(self, html):
         self.not_support('Block HTML')
