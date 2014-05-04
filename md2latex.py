@@ -1,6 +1,10 @@
 import re
 import mistune
 
+__version__ = '0.0.1'
+__author__ = 'Kavin Yao <kavinyao@gmail.com>'
+__all__ = ['MarkdownToLatexConverter']
+
 def newline(func):
     """Insert double newline at the beginning of string."""
     def inner(*args, **argv):
@@ -244,10 +248,3 @@ class MarkdownToLatexConverter(LatexRenderer):
 """
         else:
             return ''
-
-
-if __name__ == '__main__':
-    import sys
-    with open(sys.argv[1]) as f:
-        converter = MarkdownToLatexConverter()
-        print converter.convert(f.read())
