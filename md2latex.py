@@ -26,7 +26,7 @@ class MetaRenderer(mistune.Renderer):
     def autolink(self, link, is_email=False):
         return r'\\\texttt{%s}' % link
 
-class LaTeXRenderer(mistune.Renderer):
+class LatexRenderer(mistune.Renderer):
     FOOTNOTE = 'FTNT-MAGIC'
 
     use_block_quote = False
@@ -146,7 +146,7 @@ class LaTeXRenderer(mistune.Renderer):
         # return empty string as output
         return ''
 
-class MarkdownToLaTeXConverter(LaTeXRenderer):
+class MarkdownToLatexConverter(LatexRenderer):
     meta_renderer = MetaRenderer()
 
     def convert(self, doc):
@@ -185,7 +185,7 @@ class MarkdownToLaTeXConverter(LaTeXRenderer):
         md = mistune.Markdown(renderer=self)
         return self.resolve_footnotes(md.render(content))
 
-    ### The following commands use properties set in LaTeXRenderer
+    ### The following commands use properties set in LatexRenderer
 
     def resolve_footnotes(self, text):
         parts = re.split(r'%s-([^}]+)' % self.FOOTNOTE, text)
@@ -230,5 +230,5 @@ class MarkdownToLaTeXConverter(LaTeXRenderer):
 if __name__ == '__main__':
     import sys
     with open(sys.argv[1]) as f:
-        converter = MarkdownToLaTeXConverter()
+        converter = MarkdownToLatexConverter()
         print converter.convert(f.read())
