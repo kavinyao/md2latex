@@ -2,12 +2,24 @@ import re
 import mistune
 
 def newline(func):
+    """Insert double newline at the beginning of string."""
     def inner(*args, **argv):
         return '\n\n%s' % func(*args, **argv)
 
     return inner
 
+
 class MetaRenderer(mistune.Renderer):
+    """Renderer used rendering meta section.
+
+    The meta section is separated from main body by an hrule (---) and
+    contains two parts:
+    1. a first-level heading
+    2. a list of metadata in the format: - <meta_key>: <meta_value>
+
+    As a result, overriding the header and list* rendering methods is
+    sufficient. autolink is also overriden to support email in author."""
+
     def header(self, text, level, raw=None):
         return '\\title{%s}' % text
 
@@ -26,7 +38,13 @@ class MetaRenderer(mistune.Renderer):
     def autolink(self, link, is_email=False):
         return r'\\\texttt{%s}' % link
 
+
 class LatexRenderer(mistune.Renderer):
+    """Renderer for rendering markdown as LaTeX.
+
+    Only a subset of mistune-flavored markdown is supported, which will be
+    translated into a subset of LaTeX."""
+
     FOOTNOTE = 'FTNT-MAGIC'
 
     use_block_quote = False
@@ -145,6 +163,7 @@ class LatexRenderer(mistune.Renderer):
     def footnotes(self, text):
         # return empty string as output
         return ''
+
 
 class MarkdownToLatexConverter(LatexRenderer):
     meta_renderer = MetaRenderer()
