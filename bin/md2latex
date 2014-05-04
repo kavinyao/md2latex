@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
     sys.exit(1)
 
 with open(sys.argv[1]) as f:
-    converter = MarkdownToLatexConverter()
+    converter = md2latex.MarkdownToLatexConverter()
     latex = converter.convert(f.read())
 
 if len(sys.argv) == 2:
