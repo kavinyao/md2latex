@@ -6,3 +6,6 @@
 
 test.*
 !test.md
+
+MANIFEST
+dist/
