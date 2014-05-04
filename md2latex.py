@@ -20,7 +20,8 @@ class MetaRenderer(mistune.Renderer):
         if meta_key != 'author':
             return ''
 
-        return meta_val.rstrip()
+        authors = re.split(', +', meta_val.rstrip())
+        return '\n\\and\n'.join(authors)
 
     def autolink(self, link, is_email=False):
         return r'\\\texttt{%s}' % link

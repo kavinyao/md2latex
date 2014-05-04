@@ -1,6 +1,6 @@
 # Markdown to \LaTeX{} Test Document
 
-- author: Kavin Yao <kavinyao@gmail.com>
+- author: Kavin Yao <kavinyao@gmail.com>, John Doe <jdoe@example.com>
 
 ---
 
