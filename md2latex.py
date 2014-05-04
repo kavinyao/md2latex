@@ -226,8 +226,9 @@ class MarkdownToLaTeXConverter(LaTeXRenderer):
         else:
             return ''
 
-import sys
-with open(sys.argv[1]) as f:
-    converter = MarkdownToLaTeXConverter()
-    print converter.convert(f.read())
 
+if __name__ == '__main__':
+    import sys
+    with open(sys.argv[1]) as f:
+        converter = MarkdownToLaTeXConverter()
+        print converter.convert(f.read())
