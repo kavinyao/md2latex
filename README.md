@@ -8,10 +8,11 @@ See `test.md` for an example and run `python md2latex.py test.md > test.tex` to 
 
 - title
 - author(s)
-- headings to sections
-- lists to enumerate/itemize
+- headings (converted to sections)
+- lists (converted to enumerate/itemize)
 - emphasis, strong and monospace text style
-- hyperlink
+- hyperlink (using `hyperref` package)
+- footnote (in mistune syntax)
 
 ## Caveats
 
