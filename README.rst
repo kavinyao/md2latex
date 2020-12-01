@@ -3,6 +3,11 @@ md2latex
 
 A lame Markdown to LaTeX converter.
 
+IMPORTANT
+---------
+
+This project is no longer developed. Check out https://github.com/gitcordier/md2latex for an actively maintained md2latex implementation with more features.
+
 Install
 -------
 
