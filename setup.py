@@ -12,6 +12,6 @@ setup(
     description='Simple markdown to LaTeX converter.',
     long_description=open('README.rst').read(),
     install_requires=[
-        "mistune == 0.2.0",
+        "mistune == 2.0.3",
     ],
 )
